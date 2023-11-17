@@ -2,6 +2,7 @@ package com.example.android.politicalpreparedness.database
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.android.politicalpreparedness.network.models.Election
@@ -10,6 +11,7 @@ import com.example.android.politicalpreparedness.network.models.Election
 interface ElectionDao {
 
     //TODO: Add insert query
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
 
     //TODO: Add select all election query
 
@@ -18,5 +20,6 @@ interface ElectionDao {
     //TODO: Add delete query
 
     //TODO: Add clear query
+
 
 }
