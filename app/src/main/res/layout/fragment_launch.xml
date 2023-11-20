@@ -14,34 +14,31 @@
         tools:context="com.example.android.politicalpreparedness.screen.MainActivity">
 
         <ImageView
-            android:id="@+id/ivLogo"
+            android:id="@+id/image_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@null"
-            app:layout_constraintBottom_toTopOf="@+id/upcomingButton"
+            app:layout_constraintBottom_toTopOf="@+id/btn_upcoming"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ballot_logo" />
 
         <Button
-            android:id="@+id/upcomingButton"
+            android:id="@+id/btn_upcoming"
             style="@style/button_design"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/dp_0"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/upcoming_election_margin_bottom"
-            android:onClick="@{() -> viewModel.onUpcomingElectionsClicked()}"
             android:text="@string/upcoming_elections"
-            app:layout_constraintBottom_toTopOf="@+id/representativeButton"
+            app:layout_constraintBottom_toTopOf="@+id/btn_representative"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
-            android:id="@+id/representativeButton"
+            android:id="@+id/btn_representative"
             style="@style/button_design"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/dp_0"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> viewModel.onFindRepresentationsClicked()}"
             android:text="@string/find_my_representations"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

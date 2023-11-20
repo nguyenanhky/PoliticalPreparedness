@@ -18,8 +18,32 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-<!--    TextView-->
+    <!-- TextView-->
+
     <style name="title_text_view_style">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+
+    </style>
+
+    <style name="title_text_view_header_style">
+        <item name="android:textColor">@color/black_000000</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="name_style">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="common_style">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/gray50</item>
+    </style>
+
+    <style name="title_style">
         <item name="android:textColor">@color/colorAccent</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
