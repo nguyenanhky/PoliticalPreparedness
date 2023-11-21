@@ -14,7 +14,7 @@ import com.example.android.politicalpreparedness.repository.ElectionRepository
 import com.example.android.politicalpreparedness.representative.model.Representative
 import kotlinx.coroutines.launch
 
-class RepresentativeViewModel(application: Application): AndroidViewModel(application) {
+class RepresentativeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val electionDatabase = ElectionDatabase.getInstance(application)
     private val electionRepository: ElectionRepository = ElectionRepository(electionDatabase)
@@ -29,18 +29,22 @@ class RepresentativeViewModel(application: Application): AndroidViewModel(applic
     val representatives: LiveData<List<Representative>>
         get() = _representatives
 
-    fun searchRepresentatives() {
-        viewModelScope.launch {
-            val result = electionRepository.getRepresentatives(locateAddress().toFormattedString())
-            when (result) {
-                is DataResult.Success -> {
-                    _representatives.value = result.data.offices.flatMap { office ->
-                        office.getRepresentatives(result.data.officials)
-                    }
+    val isLoading: MutableLiveData<Boolean> = MutableLiveData()
+
+
+    fun searchRepresentatives() = viewModelScope.launch {
+        isLoading.value = true
+        val result = electionRepository.getRepresentatives(locateAddress().toFormattedString())
+        isLoading.value = false
+        when (result) {
+            is DataResult.Success -> {
+                _representatives.value = result.data.offices.flatMap { office ->
+                    office.getRepresentatives(result.data.officials)
                 }
-                is DataResult.Error -> {
-                    _representatives.value = emptyList()
-                }
+            }
+
+            is DataResult.Error -> {
+                _representatives.value = emptyList()
             }
         }
     }
@@ -52,7 +56,8 @@ class RepresentativeViewModel(application: Application): AndroidViewModel(applic
         state.value.toString(),
         zip.value.toString()
     )
-    fun updateStateValue(newState: String){
+
+    fun updateStateValue(newState: String) {
         state.value = newState
     }
 
@@ -68,7 +73,7 @@ class RepresentativeViewModel(application: Application): AndroidViewModel(applic
     /**
      * Factory
      */
-    class RepresentativeViewModelFactory(val application: Application):ViewModelProvider.Factory{
+    class RepresentativeViewModelFactory(val application: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(RepresentativeViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")

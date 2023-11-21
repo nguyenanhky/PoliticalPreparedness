@@ -22,12 +22,14 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:profileImage="@{representative.official.photoUrl}"
             app:srcCompat="@drawable/ic_profile" />
 
         <TextView
             android:id="@+id/txt_title"
             style="@style/name_style"
             android:layout_width="@dimen/dp_0"
+            android:text="@{representative.office.name}"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_10"
             app:layout_constraintEnd_toEndOf="parent"
@@ -41,6 +43,7 @@
             android:layout_width="@dimen/dp_0"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_10"
+            android:text="@{representative.official.name}"
             app:layout_constraintEnd_toStartOf="@+id/icon_social"
             app:layout_constraintStart_toEndOf="@+id/image_avatar"
             app:layout_constraintTop_toBottomOf="@+id/txt_title"
@@ -52,6 +55,7 @@
             android:layout_width="@dimen/dp_0"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_10"
+            android:text="@{representative.official.party}"
             app:layout_constraintEnd_toStartOf="@+id/icon_social"
             app:layout_constraintStart_toEndOf="@+id/image_avatar"
             app:layout_constraintTop_toBottomOf="@+id/txt_name"

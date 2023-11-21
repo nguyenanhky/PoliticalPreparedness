@@ -22,6 +22,8 @@
     <string name="unfollow">Unfollow</string>
     <string name="allow_location_to_fetch_your_address">Your location information is necessary to retrieve your current address.</string>
     <string name="enable_location_services_to_use_this_feature">Location access is required to utilize this functionality.</string>
+    <string name="grant_location_permission_to_enable_this_feature">Location access is required to enable this functionality.</string>
+    <string name="setting">Settings</string>
 
 
 

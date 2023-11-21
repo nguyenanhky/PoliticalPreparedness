@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
@@ -13,16 +14,15 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.view.*
-import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.android.politicalpreparedness.BuildConfig
 import com.example.android.politicalpreparedness.R
 import com.example.android.politicalpreparedness.databinding.FragmentRepresentativeBinding
-import com.example.android.politicalpreparedness.election.ElectionsViewModel
 import com.example.android.politicalpreparedness.network.models.Address
 import com.example.android.politicalpreparedness.representative.adapter.RepresentativeListAdapter
 import com.example.android.politicalpreparedness.utlis.Constance
@@ -36,6 +36,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import java.util.Locale
 
+
 class RepresentativeFragment : Fragment() {
 
     private lateinit var binding: FragmentRepresentativeBinding
@@ -43,13 +44,16 @@ class RepresentativeFragment : Fragment() {
         val activity = requireNotNull(this.activity) {
             "The viewModel is not available until onViewCreated() is called"
         }
-        ViewModelProvider(this, RepresentativeViewModel.RepresentativeViewModelFactory(activity.application))[RepresentativeViewModel::class.java]
+        ViewModelProvider(
+            this,
+            RepresentativeViewModel.RepresentativeViewModelFactory(activity.application)
+        )[RepresentativeViewModel::class.java]
     }
+
 
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var locationProvider: FusedLocationProviderClient
-    private  var retrieveLocationRetry = 0
-
+    private var locationRequestCount = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -82,7 +86,7 @@ class RepresentativeFragment : Fragment() {
                 parent: AdapterView<*>?,
                 view: View?,
                 position: Int,
-                id: Long
+                id: Long,
             ) {
                 viewModel.updateStateValue(binding.spinnerState.selectedItem as String)
             }
@@ -95,22 +99,24 @@ class RepresentativeFragment : Fragment() {
         })
 
         binding.btnLocation.setOnClickListener {
-            requestUserLocationAndFetchAddress()
+            retrieveUserLocationAddress()
         }
         binding.btnSearch.setOnClickListener {
-            //viewModel.findMyRepresentatives()
+            viewModel.searchRepresentatives()
         }
     }
 
     @SuppressLint("MissingPermission")
-    private fun requestUserLocationAndFetchAddress() {
+    private fun retrieveUserLocationAddress() {
         when {
             isFineLocationPermissionGranted() -> {
                 enableLocationServiceAndGetUserLocation()
             }
+
             shouldShowLocationPermissionRationale() -> {
                 showLocationPermissionRationale()
             }
+
             else -> {
                 requestLocationPermission()
             }
@@ -189,13 +195,13 @@ class RepresentativeFragment : Fragment() {
 
     private fun handleLocationSettingsSuccess(task: Task<LocationSettingsResponse>) {
         if (task.isSuccessful) {
-            retrieveLocationRetry = 0
-            fetchLocationAndUpdateAddress()
+            locationRequestCount = 0
+            getUserLocationAddressAndUpdate()
         }
     }
 
     @SuppressLint("MissingPermission")
-    private fun fetchLocationAndUpdateAddress() {
+    private fun getUserLocationAddressAndUpdate() {
         locationProvider.lastLocation
             .addOnSuccessListener { location: Location? ->
                 handleLocationSuccess(location)
@@ -206,8 +212,8 @@ class RepresentativeFragment : Fragment() {
         if (location != null) {
             val address = geoCodeLocation(location)
             viewModel.updateAddress(address)
-            selectSpinnerState(address)
-            retrieveLocationRetry = 0
+            setSpinnerSelection(address)
+            locationRequestCount = 0
         } else {
             handleNullLocation()
         }
@@ -215,16 +221,16 @@ class RepresentativeFragment : Fragment() {
 
     private fun handleNullLocation() {
         // Sometime, it can't get location immediately, need some delay
-        if (retrieveLocationRetry < Constance.RETRIE_LOCATION_MAXIMUM) {
-            retrieveLocationRetry += 1
+        if (locationRequestCount < Constance.LOCATION_REQUEST_MAX_COUNT) {
+            locationRequestCount += 1
             scheduleLocationRetry()
         }
     }
 
     private fun scheduleLocationRetry() {
         handler.postDelayed({
-            fetchLocationAndUpdateAddress()
-        }, Constance.RETRIE_LOCATION_DELAY)
+            getUserLocationAddressAndUpdate()
+        }, Constance.LOCATION_REQUEST_DELAY)
     }
 
     private fun geoCodeLocation(location: Location): Address {
@@ -252,7 +258,7 @@ class RepresentativeFragment : Fragment() {
         )
     }
 
-    private fun selectSpinnerState(address: Address) {
+    private fun setSpinnerSelection(address: Address) {
         val states = resources.getStringArray(R.array.states)
         binding.spinnerState.setSelection(
             if (states.contains(address.state)) {
@@ -262,8 +268,12 @@ class RepresentativeFragment : Fragment() {
             }
         )
     }
+
     private fun isFineLocationPermissionGranted(): Boolean {
-        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        return ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
 
@@ -275,10 +285,11 @@ class RepresentativeFragment : Fragment() {
             }
         }
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -290,72 +301,31 @@ class RepresentativeFragment : Fragment() {
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             handleLocationPermissionGranted()
         } else {
-            //showLocationPermissionDeniedSnackbar()
+            showLocationPermissionDeniedSnackbar()
         }
     }
 
     private fun handleLocationPermissionGranted() {
-        requestUserLocationAndFetchAddress()
+        retrieveUserLocationAddress()
     }
 
-//    private fun showLocationPermissionDeniedSnackbar() {
-//        Snackbar.make(
-//            requireActivity().findViewById(android.R.id.content),
-//            R.string.location_permission_denied_explanation,
-//            Snackbar.LENGTH_INDEFINITE
-//        )
-//            .setAction(R.string.settings) {
-//                startApplicationDetailsSettings()
-//            }.show()
-//    }
-//
-//    private fun startApplicationDetailsSettings() {
-//        startActivity(Intent().apply {
-//            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-//            data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-//            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//        })
-//    }
-
-
-    private fun checkLocationPermissions(): Boolean {
-        return if (isPermissionGranted()) {
-            true
-        } else {
-            //TODO: Request Location permissions
-            false
-        }
+    private fun showLocationPermissionDeniedSnackbar() {
+        Snackbar.make(
+            requireActivity().findViewById(android.R.id.content),
+            R.string.grant_location_permission_to_enable_this_feature,
+            Snackbar.LENGTH_INDEFINITE
+        )
+            .setAction(R.string.setting) {
+                startApplicationDetailsSettings()
+            }.show()
     }
 
-    private fun isPermissionGranted(): Boolean {
-        //TODO: Check if permission is already granted and return (true = granted, false = denied/other)
-        return false
+    private fun startApplicationDetailsSettings() {
+        startActivity(Intent().apply {
+            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        })
     }
 
-
-
-//    private fun geoCodeLocation(location: Location): Address {
-//        val geocoder = Geocoder(context, Locale.getDefault())
-//        return geocoder.getFromLocation(location.latitude, location.longitude, 1)
-//            .map { address ->
-//                Address(
-//                    address.thoroughfare,
-//                    address.subThoroughfare,
-//                    address.locality,
-//                    address.adminArea,
-//                    address.postalCode
-//                )
-//            }
-//            .first()
-//    }
-//
-//    private fun hideKeyboard() {
-//        val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//        imm.hideSoftInputFromWindow(view!!.windowToken, 0)
-//    }
-
-    /**
-     * biến: retrieveLocationRetry,RETRIE_LOCATION_MAXIMUM,RETRIE_LOCATION_DELAY,REQUEST_TURN_DEVICE_LOCATION_ON
-    function: requestUserLocationAndFetchAddress,fetchLocationAndUpdateAddress,geoCodeLocation,selectSpinnerState
-     */
 }
