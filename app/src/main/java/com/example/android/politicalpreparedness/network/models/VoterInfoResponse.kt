@@ -15,10 +15,10 @@ class VoterInfoResponse(
 fun VoterInfoResponse.asVoterInformation(): VoterData {
     val electionInfo = this.state?.first()?.electionAdministrationBody
     return VoterData(
-        voterName = electionInfo?.name ?: "",
-        electionInformationUrl = electionInfo?.electionInfoUrl ?: "",
-        pollingStationFinderUrl = electionInfo?.votingLocationFinderUrl ?: "",
-        ballotInformationUrl = electionInfo?.ballotInfoUrl ?: "",
-        voterCorrespondenceAddress = electionInfo?.correspondenceAddress?.toFormattedString() ?: ""
+        name = electionInfo?.name ?: "",
+        electionInfoUrl = electionInfo?.electionInfoUrl ?: "",
+        votingLocationFinderUrl = electionInfo?.votingLocationFinderUrl ?: "",
+        ballotInfoUrl = electionInfo?.ballotInfoUrl ?: "",
+        correspondenceAddress = electionInfo?.correspondenceAddress?.toFormattedString() ?: ""
     )
 }

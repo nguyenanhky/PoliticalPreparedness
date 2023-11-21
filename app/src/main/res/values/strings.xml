@@ -18,6 +18,12 @@
     <string name="voting_locations">Voting Locations: {url}</string>
     <string name="ballot_information">Ballot Information: {url}</string>
     <string name="error_election">Unable to retrieve upcoming election</string>
+    <string name="follow">Follow</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="allow_location_to_fetch_your_address">Your location information is necessary to retrieve your current address.</string>
+    <string name="enable_location_services_to_use_this_feature">Location access is required to utilize this functionality.</string>
+
+
 
     <!-- TODO: Add necessary string values -->
 

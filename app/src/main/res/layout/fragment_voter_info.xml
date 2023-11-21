@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.example.android.politicalpreparedness.election.VoterInfoViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,6 +21,7 @@
             style="@style/title_text_view_header_style"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@{viewModel.election.name}"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Election Name" />
 
@@ -22,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_5"
+            app:date="@{viewModel.election.electionDay}"
             app:layout_constraintTop_toBottomOf="@id/txt_election_name"
             tools:text="12 November 2055" />
 
@@ -40,6 +49,8 @@
             style="@style/common_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="@{() -> viewModel.openURL(viewModel.voterData.votingLocationFinderUrl)}"
+            app:contentVisibility="@{viewModel.voterData.votingLocationFinderUrl}"
             android:text="@string/voting_locations"
             app:layout_constraintStart_toStartOf="@id/txt_election_date"
             app:layout_constraintTop_toBottomOf="@id/txt_label_header" />
@@ -49,6 +60,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_5"
+            android:onClick="@{() -> viewModel.openURL(viewModel.voterData.ballotInfoUrl)}"
+            app:contentVisibility="@{viewModel.voterData.ballotInfoUrl}"
             android:text="@string/ballot_information"
             app:layout_constraintStart_toStartOf="@id/txt_election_date"
             app:layout_constraintTop_toBottomOf="@id/txt_voting_locations" />
@@ -58,6 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_5"
+            android:text="@{viewModel.voterData.name}"
             app:layout_constraintStart_toStartOf="@id/txt_election_date"
             app:layout_constraintTop_toBottomOf="@id/txt_ballot_information"
             tools:text="VoteInfo Name" />
@@ -67,9 +81,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_5"
+            android:text="@{viewModel.voterData.correspondenceAddress}"
             app:drawableLeftCompat="@drawable/baseline_location_on_24"
             app:layout_constraintStart_toStartOf="@id/txt_election_date"
             app:layout_constraintTop_toBottomOf="@id/txt_state_header"
+            app:contentVisibility="@{viewModel.voterData.correspondenceAddress}"
             tools:text="Correspondence Address" />
 
         <Button
@@ -77,6 +93,8 @@
             style="@style/button_design"
             android:layout_width="@dimen/dp_0"
             android:layout_height="wrap_content"
+            android:onClick="@{() -> viewModel.toggleElection(viewModel.election)}"
+            app:isFollowing="@{viewModel.isFollow}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

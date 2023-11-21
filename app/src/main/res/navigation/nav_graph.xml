@@ -32,7 +32,7 @@
         android:label="fragment_voter_info"
         tools:layout="@layout/fragment_voter_info">
         <argument
-            android:name="arg_election"
+            android:name="selected_election"
             app:argType="com.example.android.politicalpreparedness.network.models.Election" />
     </fragment>
 

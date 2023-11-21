@@ -13,7 +13,6 @@ import com.example.android.politicalpreparedness.database.ElectionDatabase.Compa
 import com.example.android.politicalpreparedness.direction.NavigationAction
 import com.example.android.politicalpreparedness.network.models.Election
 import com.example.android.politicalpreparedness.repository.ElectionRepository
-import com.example.android.politicalpreparedness.utlis.Logger
 import com.example.android.politicalpreparedness.utlis.SingleDataEvent
 import kotlinx.coroutines.launch
 
@@ -26,7 +25,7 @@ class ElectionsViewModel(private val application: Application): AndroidViewModel
 
     val navigationAction: SingleDataEvent<NavigationAction> = SingleDataEvent()
 
-    val showLoading: MutableLiveData<Boolean> = MutableLiveData()
+    val isLoading: MutableLiveData<Boolean> = MutableLiveData()
     val showToast: SingleDataEvent<String> = SingleDataEvent()
 
 
@@ -43,9 +42,9 @@ class ElectionsViewModel(private val application: Application): AndroidViewModel
     }
 
     private fun fetchElections() = viewModelScope.launch {
-        showLoading.value = true
+        isLoading.value = true
         val result = electionRepository.getElections()
-        showLoading.value = false
+        isLoading.value = false
         when (result) {
             is DataResult.Success -> _elections.value = result.data.elections
             is DataResult.Error -> {

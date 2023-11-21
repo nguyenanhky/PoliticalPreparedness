@@ -9,7 +9,7 @@ import java.util.*
 @Entity(tableName = "election_table")
 @Parcelize
 data class Election(
-        @PrimaryKey val id: Int,
+        @PrimaryKey val id: Long,
         @ColumnInfo(name = "name")val name: String,
         @ColumnInfo(name = "electionDay")val electionDay: Date,
         @Embedded(prefix = "division_") @Json(name="ocdDivisionId") val division: Division

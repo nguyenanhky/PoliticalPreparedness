@@ -12,7 +12,7 @@ import com.example.android.politicalpreparedness.network.models.Election
 interface ElectionDao {
 
     //TODO: Add insert query
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertElection(election: Election)
 
     //TODO: Add select all election query

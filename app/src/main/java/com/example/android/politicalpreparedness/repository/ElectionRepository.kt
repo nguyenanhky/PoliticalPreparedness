@@ -9,8 +9,8 @@ import com.example.android.politicalpreparedness.network.CivicsApi
 import com.example.android.politicalpreparedness.network.CivicsApiService
 import com.example.android.politicalpreparedness.network.models.Election
 import com.example.android.politicalpreparedness.network.models.ElectionResponse
+import com.example.android.politicalpreparedness.network.models.RepresentativeResponse
 import com.example.android.politicalpreparedness.network.models.asVoterInformation
-import com.example.android.politicalpreparedness.utlis.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -22,7 +22,6 @@ class ElectionRepository(
 
     override suspend fun getElections(): DataResult<ElectionResponse> = withContext(Dispatchers.IO){
         return@withContext try {
-            Logger.lod("getElections: ${service.getElections()}")
             DataResult.Success(service.getElections())
         } catch (ex: Exception) {
             DataResult.Error(ex.localizedMessage)
@@ -56,6 +55,14 @@ class ElectionRepository(
     override suspend fun deleteElection(election: Election) {
         withContext(Dispatchers.IO) {
             electionDatabase.electionDao.deleteElection(election)
+        }
+    }
+
+    override suspend fun getRepresentatives(address: String): DataResult<RepresentativeResponse> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            DataResult.Success(service.getRepresentativesByAddress(address))
+        } catch (ex: Exception) {
+            DataResult.Error(ex.localizedMessage)
         }
     }
 

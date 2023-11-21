@@ -1,9 +1,9 @@
 package com.example.android.politicalpreparedness.data
 
 data class VoterData(
-    val voterName: String = "",
-    val electionInformationUrl: String = "",
-    val pollingStationFinderUrl: String = "",
-    val ballotInformationUrl: String = "",
-    val voterCorrespondenceAddress: String = ""
+    val name: String = "",
+    val electionInfoUrl: String = "",
+    val votingLocationFinderUrl: String = "",
+    val ballotInfoUrl: String = "",
+    val correspondenceAddress: String = ""
 )

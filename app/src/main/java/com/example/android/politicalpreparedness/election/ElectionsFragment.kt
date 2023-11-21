@@ -9,10 +9,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.android.politicalpreparedness.R
 import com.example.android.politicalpreparedness.databinding.FragmentElectionBinding
+import com.example.android.politicalpreparedness.direction.NavigationAction
 import com.example.android.politicalpreparedness.election.adapter.ElectionListAdapter
 import com.example.android.politicalpreparedness.repository.ElectionRepository
+import com.example.android.politicalpreparedness.utlis.Logger
 
 class ElectionsFragment : Fragment() {
 
@@ -36,7 +39,7 @@ class ElectionsFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_election, container, false)
         binding.electionListViewModel = viewModel
         binding.lifecycleOwner = this
-        return null
+        return binding.root
 
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,6 +47,11 @@ class ElectionsFragment : Fragment() {
         init()
     }
     private fun init() {
+        upComingElections()
+        saveElections()
+    }
+
+    private fun upComingElections() {
         val electionListAdapter = ElectionListAdapter(ElectionListAdapter.ElectionListener {
             viewModel.onElectionItemClick(it)
         })
@@ -53,6 +61,19 @@ class ElectionsFragment : Fragment() {
             electionListAdapter.submitList(elections)
         })
 
+        viewModel.navigationAction.observe(viewLifecycleOwner,Observer{
+            when (it) {
+                is NavigationAction.Open-> findNavController().navigate(it.directions)
+                is NavigationAction.Back -> findNavController().popBackStack()
+                is NavigationAction.BackTo -> findNavController().popBackStack(
+                    it.destinationId,
+                    false
+                )
+            }
+        })
+    }
+
+    private fun saveElections() {
         val savedElectionListAdapter = ElectionListAdapter(ElectionListAdapter.ElectionListener {
             viewModel.onElectionItemClick(it)
         })
@@ -61,7 +82,7 @@ class ElectionsFragment : Fragment() {
         viewModel.savedElections.observe(viewLifecycleOwner, Observer { elections ->
             savedElectionListAdapter.submitList(elections)
         })
-
     }
+
 
 }
