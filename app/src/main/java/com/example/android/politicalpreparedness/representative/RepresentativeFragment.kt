@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
@@ -50,6 +49,9 @@ class RepresentativeFragment : Fragment() {
         )[RepresentativeViewModel::class.java]
     }
 
+    private val sharedPreferences by lazy {
+        activity?.getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE)
+    }
 
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var locationProvider: FusedLocationProviderClient
@@ -65,13 +67,22 @@ class RepresentativeFragment : Fragment() {
             container, false
         )
         binding.lifecycleOwner = this
+        binding.viewModel = viewModel
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        bindUpdateView()
         initializeUI()
+    }
 
+    private fun bindUpdateView() {
+        viewModel.addressLine1.value = sharedPreferences?.getString("addressLine1", "")
+        viewModel.addressLine2.value = sharedPreferences?.getString("addressLine2", "")
+        viewModel.city.value = sharedPreferences?.getString("city", "")
+        viewModel.state.value = sharedPreferences?.getString("state", "")
+        viewModel.zip.value = sharedPreferences?.getString("zip", "")
     }
 
     private fun initializeUI() {
@@ -326,6 +337,19 @@ class RepresentativeFragment : Fragment() {
             data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         })
+    }
+
+    override fun onStop() {
+        super.onStop()
+        val editor = sharedPreferences?.edit()
+        editor?.let {
+            it.putString("addressLine1",viewModel.addressLine1.value)
+            it.putString("addressLine2", viewModel.addressLine2.value)
+            it.putString("city", viewModel.city.value)
+            it.putString("state", viewModel.state.value)
+            it.putString("zip", viewModel.zip.value)
+            it.apply()
+        }
     }
 
 }
