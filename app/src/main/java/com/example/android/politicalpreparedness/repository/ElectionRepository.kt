@@ -11,6 +11,8 @@ import com.example.android.politicalpreparedness.network.models.Election
 import com.example.android.politicalpreparedness.network.models.ElectionResponse
 import com.example.android.politicalpreparedness.network.models.RepresentativeResponse
 import com.example.android.politicalpreparedness.network.models.asVoterInformation
+import com.example.android.politicalpreparedness.representative.model.Representative
+import com.example.android.politicalpreparedness.representative.model.Representatives
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -65,6 +67,12 @@ class ElectionRepository(
             DataResult.Error(ex.localizedMessage)
         }
     }
+
+    override suspend fun insertRepresentatives(representatives: Representatives) = withContext(Dispatchers.IO){
+        electionDatabase.representativeDao.insertRepresentative(representatives)
+    }
+
+    override fun getAllRepresentatives(): LiveData<Representatives>  = electionDatabase.representativeDao.getAllElections()
 
 
 }

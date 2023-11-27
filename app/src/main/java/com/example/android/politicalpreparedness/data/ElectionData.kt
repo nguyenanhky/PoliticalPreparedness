@@ -5,6 +5,8 @@ import com.example.android.politicalpreparedness.data.dto.DataResult
 import com.example.android.politicalpreparedness.network.models.Election
 import com.example.android.politicalpreparedness.network.models.ElectionResponse
 import com.example.android.politicalpreparedness.network.models.RepresentativeResponse
+import com.example.android.politicalpreparedness.representative.model.Representative
+import com.example.android.politicalpreparedness.representative.model.Representatives
 
 interface ElectionData {
 
@@ -16,4 +18,9 @@ interface ElectionData {
     suspend fun deleteElection(election: Election)
 
     suspend fun getRepresentatives(address: String): DataResult<RepresentativeResponse>
+    //fun getAllRepresentatives():LiveData<List<RepresentativeResponse>>
+
+    suspend fun insertRepresentatives(representatives: Representatives)
+
+    fun getAllRepresentatives():LiveData<Representatives>
 }

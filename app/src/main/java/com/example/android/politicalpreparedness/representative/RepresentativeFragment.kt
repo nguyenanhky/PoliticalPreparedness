@@ -105,8 +105,10 @@ class RepresentativeFragment : Fragment() {
 
         val representativeListAdapter = RepresentativeListAdapter()
         binding.rvRepresentations.adapter = representativeListAdapter
-        viewModel.representatives.observe(viewLifecycleOwner, Observer { representatives ->
-            representativeListAdapter.submitList(representatives)
+        viewModel.local.observe(viewLifecycleOwner, Observer { representatives ->
+            if(representatives!=null){
+                representativeListAdapter.submitList(representatives.representatives)
+            }
         })
 
         binding.btnLocation.setOnClickListener {

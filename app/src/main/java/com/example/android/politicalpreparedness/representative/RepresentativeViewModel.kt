@@ -12,6 +12,7 @@ import com.example.android.politicalpreparedness.database.ElectionDatabase
 import com.example.android.politicalpreparedness.network.models.Address
 import com.example.android.politicalpreparedness.repository.ElectionRepository
 import com.example.android.politicalpreparedness.representative.model.Representative
+import com.example.android.politicalpreparedness.representative.model.Representatives
 import kotlinx.coroutines.launch
 
 class RepresentativeViewModel(application: Application) : AndroidViewModel(application) {
@@ -41,13 +42,22 @@ class RepresentativeViewModel(application: Application) : AndroidViewModel(appli
                 _representatives.value = result.data.offices.flatMap { office ->
                     office.getRepresentatives(result.data.officials)
                 }
+
+                representatives.value?.let { Representatives(representatives = it) }
+                    ?.let { electionRepository.insertRepresentatives(it) }
+
+                //_local.value = electionRepository.getAllRepresentatives().value?.representatives
             }
 
             is DataResult.Error -> {
                 _representatives.value = emptyList()
             }
         }
+
     }
+
+    val local = electionDatabase.representativeDao.getAllElections()
+
 
     private fun locateAddress() = Address(
         addressLine1.value.toString(),
